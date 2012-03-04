@@ -2,6 +2,7 @@
 layout: post
 published: false
 title: An Introduction to Method Combinations
+tags: method-combinations
 ---
 
 For some reason, method combinations have never been a very popular feature of Common Lisp.
