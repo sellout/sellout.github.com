@@ -1,8 +1,8 @@
 ---
-layout: post
-publish: false
-title: Beyond Method Combinations
-tags: method-combinations
+    layout: post
+    publish: false
+    title: Beyond Method Combinations
+    tags: method-combinations
 ---
 
 Up to this point I’ve been lying to you – remember [ContextL](http://common-lisp.net/project/closer/contextl.html)? It doesn't use method combinations. [Filtered Functions](http://common-lisp.net/project/closer/filtered.html)? It doesn't use method combinations (at least not in an interesting way).
