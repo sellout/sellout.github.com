@@ -33,7 +33,28 @@ will give you a function that uses the progn combination. This means you can def
 (defmethod foo progn ((x vector))   (print (array-element-type x))
 ```
 
-All of the non-`STANDARD` built-in combinations have the same pattern. 
+All of the non-`STANDARD` built-in combinations have the same pattern. In general, they are very useful if you are trying to enforce a particular method behavior. For example, if you write multiple methods and they all look like
+
+```common-lisp
+(defmethod foo ((bar subclass))
+  (append (call-next-method)
+          (subclass-field bar)))
+```
+
+(or, if your docstring says “If you override this method, you must CALL-NEXT-METHOD for it to work properly”) then you should really be doing
+
+```common-lisp
+(defgeneric foo (bar)
+  (:method-combination append :most-specific-last))
+```
+
+which will enforce the `(append (call-next-method) ...)` behavior, and also ensure that people who override the method are aware of the behavior, because they must include the name of the combination in the method definition:
+
+```common-lisp
+(defmethod foo append ((bar subclass))
+  (subclass-field bar))
+```
+
 Here are the apparently useful built-in combinations, in order of popularity.
 
 `PROGN`
