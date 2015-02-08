@@ -43,7 +43,7 @@ Since this seems like a very useful pattern for qualifiers that can't easily be 
 
 Now, what does Filtered Functions do that can't be done with method combinations? FF replaces the specializer with the discriminating value. While the qualifiers and specializers are all available during method combination, `COMPUTE-APPLICABLE-METHODS` runs before method combination, and without special handling, it will consider the methods non-applicable because the specializers aren't correct. So the method combination never sees those methods.
 
-[Reasonable-Utilities](https://github.com/vseloved/rutils/blob/24583101a54cb8c65391d852cc3d31a6005c81a0/experimental.lisp)’ `MULTI` combination provides something similar to Filtered Functions, but the discriminating value is stored as a qualifier, so it can be implemented as a combination. Here is a modified version that behaves a bit more like Filtered Functions than the original:
+[Reasonable-Utilities](https://github.com/vseloved/rutils/blob/24583101a54cb8c65391d852cc3d31a6005c81a0/experimental.lisp)’ `MULTI` combination provides something similar to Filtered Functions, but the discriminating value is stored as a qualifier, so it can be implemented as a combination (there is also an attempt to implement [multimethods without using method combination](https://github.com/strawhatguy/multimethods)). Here is a modified version that behaves a bit more like Filtered Functions than the original:
 
 
 ```common-lisp
