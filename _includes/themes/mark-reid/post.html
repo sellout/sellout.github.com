@@ -8,6 +8,10 @@
 
   {{ content }}
 
+  <div class="annotations">
+    <p>[{% include sellout/post_history %}]</p>
+  </div>
+
   <address class="signature">
     <a class="author" href="{{ HOME_PATH }}">{{ site.author.name }}</a> 
     <span class="date">{{ page.date | date_to_long_string }}</span>

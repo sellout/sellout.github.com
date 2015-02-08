@@ -1,0 +1,1 @@
+<a href="https://github.com/sellout/sellout.github.com/commits/master/_posts/{{ page.url | remove_first: "/" | replace: "/", "-" | append: ".md" }}">GitHub history for this post</a>
