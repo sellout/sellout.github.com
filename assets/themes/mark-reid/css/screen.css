@@ -162,10 +162,22 @@ caption {
 
 /* @group Lists */
 ul {
-	margin-top: 1.5em;
-	margin-bottom: 1.5em;
-	line-height: 1.5em;
-	padding-left: 1.5em;
+    margin: 0 0 1.5em 0;
+}
+ul ul {
+    margin: 0 0 0 1.5em;
+}
+ol {
+    margin: 0 0 1.5em 0;
+}
+ol ol {
+    margin: 0 0 0 1.5em;
+}
+ul ol {
+    margin: 0 0 0 1.5em;
+}
+ol ul {
+    margin: 0 0 0 1.5em;
 }
 ul li {
 	list-style-type: square;
