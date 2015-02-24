@@ -3,7 +3,9 @@
 permalink: /:categories/:year/:month/:day/:title 
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
-highlighter: pygments
+markdown: kramdown
+highlighter: rouge
+#highlighter: pygments
 
 # Themes are encouraged to use these universal variables 
 # so be sure to set them if your theme uses them.
@@ -26,6 +28,9 @@ author :
 # Finally if you are pushing to a GitHub project page, include the project name at the end.
 #
 production_url : http://sellout.github.io
+
+kramdown:
+  input: GFM
 
 # All Jekyll-Bootstrap specific configurations are namespaced into this hash
 #

@@ -1,6 +1,6 @@
 <div id="page">
 	
-  <h1 class="emphnext">{{ page.title }}</h1>
+  <h1 class="emphnext">{{ page.title | markdownify }}</h1>
   <ul class="tag_box inline">
   {% assign tags_list = page.tags %}
   {% include JB/tags_list %}
@@ -20,10 +20,10 @@
   
   <div class="prev-next">
   {% if page.next %}
-    <a href="{{ page.next.url }}" class="next" title="{{ page.next.title }}">Next Post &rarr;</a>
+    <a href="{{ page.next.url }}" class="next" title="{{ page.next.title | markdownify | strip_html }}">Next Post &rarr;</a>
   {% endif %}
   {% if page.previous %}
-    <a href="{{ page.previous.url }}" class="prev" title="{{ page.previous.title }}">&larr; Earlier Post</a>
+    <a href="{{ page.previous.url }}" class="prev" title="{{ page.previous.title | markdownify | strip_html }}">&larr; Earlier Post</a>
   {% endif %}
   </div>
   
