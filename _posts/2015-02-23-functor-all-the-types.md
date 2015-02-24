@@ -122,7 +122,28 @@ Alright, yes, you have a point. But that is costly. First you have to recursivel
 j2d :: JsonF a -> DataF a
 d2x :: DataF a -> XmlF a
 
-d2x ∘ j2d :: Json a -> Xml a
+d2x ∘ j2d :: JsonF a -> XmlF a
 ```
 
 Oh man, these structures are so nice, they have a special name – natural transformations!
+
+Now, what this version has done is changed the conversion from one that converts an entire `Json` tree through an entire `Data` tree to an entire `Xml` tree into a conversion from a single `JsonF` node through a single `DataF` node to a single `XmlF` node.
+
+This means that you never build up a `Data` tree. But how do we turn this into the structure we really want? `Json -> Xml`? That brings us to … recursion schemes. For something just like what we have, it’s pretty simple and we can use all kinds of variations, but most directly, just `cata (d2x ∘ j2d)`. For those who _do_ know Haskell, that is just a generalized `foldr`. Of course, you often have other conversions, too. EG, say you store JSON on disk and send XML over the network, so we really want to convert a `String` (of JSON) to a `ByteArray` (of XML).
+
+```haskell
+readJson :: String -> JsonF String
+sendXml :: XmlF ByteArray -> ByteArray
+```
+
+Those signatures look a bit odd, don’t they? I mean, I’m trying to convert _to_ a ByteArray, how did I end up with a `ByteArray` in my XML?
+
+That has to do with the bottom-up nature of these folds. Think about it this way: You start out with `Fix XmlF` (which you can unwind a little to `XmlF (Fix XmlF)`), you then convert all the leaves to ByteArrays. Now, you pop back to the next level up, and you have `XmlF ByteArray` at that level (since you’ve converted all its children. You can now use the `sendXml` function to convert that level, then pop up, use `sendXml` again, etc. And to wrap it up, since the leaves by definition don’t have any children, there’s no difference there between `XmlF (Fix XmlF)` and `XmlF ByteString`, so `sendXml` operates just fine on those leaves we converted first.
+
+But now we want one _efficient_ operation that converts from that `String` on disk to a `ByteArray` over the network.
+
+```haskell
+hylo sendXml (d2x ∘ j2d) readJson
+```
+
+`hylo` is related to (but a bit more complicated than) the `cata` we saw before. It has three components (from left to right) the folding function, a natural transformation, and the unfolding function. They’re used in right-to-left order, similar to usual function compositon. You can parse that as “we read the JSON, convert it to `Data`, convert that to XML, then send the XML.”
