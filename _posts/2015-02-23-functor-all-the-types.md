@@ -4,6 +4,7 @@ title: "FUNCTOR _ALL_ THE TYPES!"
 description: ""
 category: 
 tags: []
+published: false
 ---
 {% include JB/setup %}
 
