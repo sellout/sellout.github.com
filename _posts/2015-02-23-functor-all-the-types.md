@@ -86,7 +86,7 @@ data JsonF a = JNull
 
 The first step was simple – we’ve replaced the recursive reference with a new type parameters (aka, generics/templates/whatever). Like with the function case, trying to pass the type itself as the parameter gets us into infinite regression, so we need something like the Y combinator. The basic form for this is `Fix` (there are some useful more restricted versions called `Mu` and `Nu`, but we’re not going to worry about those right now).
 
-This shape of a data structure is known as a “functor”. There’s not much to a functor except for the function `map :: Functor f => (a -> b) -> f a -> f b` (which, for those without Haskell experience si a function that takes a function from `a` to `b` and then a functor “containing” `a`s and returns a functor “containing” `b`s – `List` is a common functor, so if you replace `f` with `List`, you can see what you might normally think of as the `map` function).
+This shape of a data structure is known as a “functor”. There’s not much to a functor except for the function `map :: Functor f => (a -> b) -> f a -> f b` (which, for those without Haskell experience is a function that takes a function from `a` to `b` and then a functor “containing” `a`s and returns a functor “containing” `b`s – `List` is a common functor, so if you replace `f` with `List`, you can see what you might normally think of as the `map` function).
 
 Unlike with the function case, where we picked up on the Y combinator because recursion wasn’t available to us, here we can use the recursive form of `Fix` directly: `newtype Fix f = Fix (f (Fix f))`. One thing to note here is that the first and third `Fix` refer to the type name (the first defines it, the third is the recursive reference), while the second `Fix` is the name of the constructor to create a value of type `Fix f`.
 
@@ -108,7 +108,7 @@ I’ve come up with a couple of my own:
 * `FaultTolerant`, which is a combination of `Fix` and `Free` – it has a third case (relative to `Free`) that indicates that a branch is successful to the end, eliminating the need to traverse to the leaves looking for failures.
 * `Diff`, which is complicated in structure, but unifies two recursive structures, duplicating only the parts of them that differ.
 
-This kind of flexibility is already impressive. Your single data structure is now easily malleable into many related structures, without having to duplicate code and write tedious conversion operations that frustrate you every time you make any adjustment to you data structure.
+This kind of flexibility is already impressive. Your single data structure is now easily malleable into many related structures, without having to duplicate code and write tedious conversion operations that frustrate you every time you make any adjustment to your data structure.
 
 But that’s not all!
 
