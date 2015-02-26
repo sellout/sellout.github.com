@@ -138,7 +138,7 @@ sendXml :: XmlF ByteArray -> ByteArray
 
 Those signatures look a bit odd, don’t they? I mean, I’m trying to convert _to_ a ByteArray, how did I end up with a `ByteArray` in my XML?
 
-That has to do with the bottom-up nature of these folds. Think about it this way: You start out with `Fix XmlF` (which you can unwind a little to `XmlF (Fix XmlF)`), you then convert all the leaves to ByteArrays. Now, you pop back to the next level up, and you have `XmlF ByteArray` at that level (since you’ve converted all its children. You can now use the `sendXml` function to convert that level, then pop up, use `sendXml` again, etc. And to wrap it up, since the leaves by definition don’t have any children, there’s no difference there between `XmlF (Fix XmlF)` and `XmlF ByteString`, so `sendXml` operates just fine on those leaves we converted first.
+That has to do with the bottom-up nature of these folds. Think about it this way: You start out with `Fix XmlF` (which you can unwind a little to `XmlF (Fix XmlF)`), you then convert all the leaves to ByteArrays. Now, you pop back to the next level up, and you have `XmlF ByteArray` at that level (since you’ve converted all its children to `ByteArray`). You can now use the `sendXml` function to convert that level, then pop up, use `sendXml` again, etc. And to wrap it up, since the leaves by definition don’t have any children, there’s no difference there between `XmlF (Fix XmlF)` and `XmlF ByteString`, so `sendXml` operates just fine on those leaves we converted first.
 
 But now we want one _efficient_ operation that converts from that `String` on disk to a `ByteArray` over the network.
 
