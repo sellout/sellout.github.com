@@ -15,7 +15,7 @@ I’m interested in the field, so I’ve learned a few things:
 
 ![](/media/what I know.png)
 
-But when I talk to others and share that knowledge, they assume I know other things:
+When I talk to others and share that knowledge, they assume I know other things:
 
 ![](/media/what people assume.png)
 
@@ -27,7 +27,7 @@ And I make assumptions about their knowledge, as well:
 
 ![](/media/what I assume.png)
 
-But there’s a lot we can learn from each other, and those assumptions can either get in the way of that or give us an opportunity to discover more:
+There’s a lot we can learn from each other, and we can either let those assumptions get in the way of that or take the opportunity to discover more together:
 
 ![](/media/learning.png)
 
