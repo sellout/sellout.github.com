@@ -5,7 +5,7 @@ tagline: and rapidly running out of metaphorical water
 ---
 {% include JB/setup %}
 
-I am a hobbyist and professional programming language designer and compiler writer. I currently am paid to work on <abbr title="Free and Open Source Software">FOSS</abbr> by [SlamData](http://slamdata.com).
+I am a hobbyist and professional programming language designer and compiler writer.
 
 This blog is a _blog_, not a textbook or research publication. I’ll probably get things wrong a _lot_. Please (politely) challenge my assumptions in the comments or feel free to ask for references, but don’t blindly trust anything I’ve written here.
 
