@@ -12,6 +12,10 @@ This is a response to [The RIO Monad.](https://www.fpcomplete.com/blog/2017/07/t
 
 **NB**: This is a draft that I didn't intend to make public. But it is, so I'll leave it up (with some edits). Apologies for just barely touching on a number of the points I make. Please feel free to ask about them in the comments, and I'll try to expand upon them either here or in separate posts that I'll link from here.
 
+# tl;dr
+
+Avoid monad (transformer) stacks, see them as a hint to refactor, decomposing the operations. Tools like `MonadUnliftIO` can be useful when dealing with code you don't have control over and for keeping technical debt in check, but they should be seen as a stop-gap on the way toward more well-structured code, not a goal on their own.
+
 # pointwise
 
 ## What's happening in Stack?
