@@ -10,6 +10,8 @@ tags: []
 
 This is a response to [The RIO Monad.](https://www.fpcomplete.com/blog/2017/07/the-rio-monad). It currently makes the most sense if read side-by-side with that post.
 
+**NB**: This is a draft that I didn't intend to make public. But it is, so I'll leave it up (with some edits). Apologies for just barely touching on a number of the points I make. Please feel free to ask about them in the comments, and I'll try to expand upon them either here or in separate posts that I'll link from here.
+
 # pointwise
 
 ## What's happening in Stack?
@@ -51,9 +53,9 @@ This section is absolutely right.
 
 ## Custom `ReaderT`
 
-Nope. No no no.
+I don't agree with this section.
 
-The `LoggingT` situation leading to here *is* exactly the kind of thing that should make you rethink what you're doing, but newtyping a `newtype` (which isn't *completely* unreasonable in some cases) is not the way to do it.
+The `LoggingT` situation leading to here *is* exactly the kind of thing that should make you [rethink what you're doing](#logging), but newtyping a `newtype` (which is fine in some cases) is not the way to do it.
 
 ## Be more general!
 
@@ -61,9 +63,11 @@ The `LoggingT` situation leading to here *is* exactly the kind of thing that sho
 
 ## `Has` type classes
 
+I've not been a fan of classy optics. I think there are more general multi-parameter type classes (`:<:` and `:>:`) that solve the same problem without having to TH a bunch of new classes for every type.
+
 `HasFoo a ~ Foo :<: a ~ Lens' a Foo`
 
-and there's also
+and
 
 `AsFoo a ~ a :>: Foo ~ Prism' a Foo`
 
@@ -73,21 +77,25 @@ I don't think this part is necessarily bad (other than wanting to avoid the type
 
 ## Exception handling
 
-Please god, not `MonadBaseControl`.
+Agree with this -- please don't `MonadBaseControl`.
 
 But more generally -- why are you even using execptions? `Either` is the correct answer here. And this could get into a whole thing about duoids (like the relationship `Either` and `Validation` have to each other.
 
 ## Introducing `MonadUnliftIO`
 
-Nooooooooo!
+unliftio is a good library. I certainly use it (some parts more than others). `MonadUnliftIO` is an improvement over `MonadBaseControl`, and if I ever see the former I immediately replace it.
 
-Avoid `MonadCatch m => StateT s m a` problems by avoiding state stacks, not by adding more magic in the stack classes.
+However, you should avoid `MonadCatch m => StateT s m a` problems by avoiding state stacks, not by adding more magic in the stack classes.
+
+Sometimes, that's out of your control. I have found myself in situations too often where a call to a 3rd-party library gives me back an unholy stack. My options are to replace the library, or do the best I can to insulate the rest of my code from the stack. So I generally do the latter and unliftio can be very helpful there.
+
+But in your own code, you shouldn't build a stack like that.
 
 ## More concrete
 
 "We're not writing a generally-consumable library. We're writing an application." -- This is the wrong mindset. It forces contributors (both different teams on a corporate project and someone trying to make a PR in OSS) to have much more of the project in their head in order to make a change. An application should be thought of as a number of interacting libraries with a relatively thin layer that really turns it into an application.
 
-"We've already added a MonadUnliftIO constraint on our functions" -- but you shouldn't have. Again, those classes are just duct tape on code that should really be refactored.
+"We've already added a `MonadUnliftIO` constraint on our functions" -- but you shouldn't have. Again, those classes are just duct tape on code that should really be refactored.
 
 ## Should we be that general?
 
@@ -103,7 +111,9 @@ Same. `Monad*` is totally an anti-pattern. Glad to hear it.
 
 ## Why not `ReaderT`?
 
-So, I agreed that `ReaderT` doesn't buy us anything (and, in general, transformers should be seen as instance selectors), but I don't see how `ReaderT` is a problem compared to `RIO`. If we're using 
+So, I agreed that `ReaderT` doesn't buy us anything (and, in general, transformers should be seen as instance selectors) and `RIO` is a slightly-more-constrained newtype that is used instead in order to give us better instances.
+
+But the same reasons to avoid `ReaderT` in the first place still apply to `RIO`.
 
 ## Some notes on the `Has` typeclasses
 
@@ -124,7 +134,8 @@ instance a :<: a where
   get = id
   set = const id
 
--- | reversed version of `class HasRunner env => HasConfig env`, which simultaneously provides `HasRunner Config`, `HasRunner BuildConfig`, etc.
+-- | reversed version of `class HasRunner env => HasConfig env`, which
+--   simultaneously provides `HasRunner Config`, `HasRunner BuildConfig`, etc.
 instance Config :<: a => Runner :<: a where
   get = configRunner . get
   set old new = old { configRunner = new }
@@ -138,7 +149,7 @@ instance EnvConfig :<: a => BuildConfig :<: a where
   set old new = old { envConfigBuildConfig = new }
 ```
 
-Now you only need to define the highest instance in the tree -- and often not even that. E.g., we already have \`Runner :<: EnvConfig\` in the above definitions.
+Now you only need to define the highest instance in the tree -- and often not even that. E.g., we already have `Runner :<: EnvConfig` in the above definitions.
 
 -   `Runner :<: EnvConfig` is implied by
 -   `Config :<: EnvConfig`, which is implied by
@@ -154,9 +165,13 @@ The last option here is what I strive for. Again, the rest are usually hints tha
 
 ## Using `RIO` in your application
 
-Don't.
+Hopefully I've at least gotten you to question this approach. Again, sometimes you are saddled with stacks from other code and knowing how to manage them (like RIO does) is very useful. But I think in general there is way too much effort and information on how to manage stacks and not nearly enough on how and why to avoid building them in the first place.
+
+Doing the right thing when you have a stack is important, but more often you should be asking how you can avoid the stack that you're looking at.
 
 # Additional points
+
+This section would be better as separate posts, but they exist in service of the points above, so they're here for the time being.
 
 ## <a id="boolean"></a>Eliminating boolean blindness
 
@@ -223,7 +238,40 @@ Not at all! It's a pure function, which means that when we call it with those sa
 
 ### user information
 
-The Stack use case for logging is different. It's providing information to the user (instead of the developer) to let them see what's happening along the way. They don't care what part of your code is pure or not, they just want to see various pieces of information as they're available. Often this information is not stuff that gets returned directly, but perhaps has already been processed into some other form by the time you're back at a level with `IO`.
+The Stack use case for logging is different. It's providing information to the user (instead of the developer) to let them see what's happening along the way. They don't care what part of your code is pure or not, they just want to see various pieces of information as they're available. Often this information is not stuff that gets returned directly, but perhaps has already been processed into some other form by the time you're back at a level with `IO`. This means you're trying to exfiltrate some internal state so you can report it to the user.
+
+The trick is to understand that if the state is truly internal, you shouldn't report it to the user. If it's something that you do want to report to the user, then there should be some part of the API that exposes it. So, the sweet spot for your definition should be the steps that you want to report to the user. E.g.,
+
+```haskell
+process :: Config -> IO A
+process =
+  logFinalRes . finalStep
+  <=< logRes2 . step2
+  <=< logRes1 . step1
+```
+where the `*step*` functions are all pure functions that encapsulate each thing that the application user can distinguish (and are all defined in some other library, or at least a separate module).
+
+However, it's not uncommon that what you're trying to log is the steps of a _recursive function_. Which becomes much harder to extricate the logging from. If you know me, you know what's coming next ... this is where you want to decompose your recursive function into an algebra and use recursion schemes. So a pure
+```haskell
+cata evalTree myTree
+```
+becomes
+```haskell
+cataM (effectStep myLogger evalTree)
+```
+where we have
+```haskell
+-- | Takes a function that can log both the input and output of an algebra, the algebra itself, and returns a (now effectful) algebra.
+effectStep :: Applicative m => (f a -> a -> m ()) -> (f a -> a) -> f a -> m a
+effectStep eff alg input =
+  let res = alg input
+  in eff input res *> pure res
+```
+and `myLogger` is a function specific to your application.
+
+But again, you don't always have this kind of control over the code you're using. You're sometimes stuck. And in those cases, yes, you need `IO` to (hopefully temporarily) leak into places it generally shouldn't in order to avoid long refactorings.
+
+It's important to see those cases as technical debt and good "effect management" is a way to minimize that debt. But these should still be seen stop-gaps, not a desirable final architecture.
 
 ## How to refactor your stacks away
 
